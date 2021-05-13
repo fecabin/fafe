@@ -1,0 +1,20 @@
+<clr-modal [(clrModalOpen)]="editModalOpen" >
+        <div class="modal-title">Edit Defect Information</div>
+        <div class="modal-body">
+            <section class="form-block">
+                <div class="form-group ">
+                    <label>Defect Size</label>
+                    <input type="text" name="firstName"  *ngIf="defect" [(ngModel)]="defect.defectSize" placeholder="first name" required>
+                </div>
+                <div class="form-group ">
+                    <label>Defect Element</label>
+                    <input type="text" name="lastName" *ngIf="defect" [(ngModel)]="defect.defectElement" placeholder="last name"  required>
+                </div>
+            </section>
+        </div>
+
+        <div class="modal-footer">
+            <button (click)="close()" class="btn btn-default">Cancel</button>
+            <button type="submit" class="btn btn-primary">OK</button>
+        </div>
+</clr-modal>

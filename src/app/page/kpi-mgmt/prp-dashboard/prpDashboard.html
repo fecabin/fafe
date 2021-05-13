@@ -1,0 +1,196 @@
+
+<!--<div class="container-fluid" style="text-align: center; height: 50px; background-color:#eeeeee;color:#333333" >
+  <div >
+  <span class="card-block" style=" font-size:x-large;font-weight: bold;">EUV Mask Case Center</span>
+  </div>
+  <div style="text-align: right;">
+   
+    <div class="dropdown">
+      <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Date
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">2021Q1</a></li>
+        <li><a class="dropdown-item" href="#">Another action</a></li>
+        <li><a class="dropdown-item" href="#">Something else here</a></li>
+      </ul>
+    </div>
+    <select name="cars"  style="text-align: right;">
+      <option value="2021Q1">2021/03/19</option>
+     
+    </select>
+ </div>
+</div>
+-->
+
+<div class="container-fluid" style="margin:0px;padding:3px;text-align: center; height: 27px; background-color:#eeeeee;color:rgb(51, 49, 49)" >
+  <div >
+    <span class="card-block" style=" font-size:x-large;font-weight: bold;">PRP Dashboard</span>
+  </div>
+</div>
+<div class="clr-form-control1 card" style="height: 30px;margin-bottom: 10px;margin-top: 10px;">
+  <span class="col-1"  style="font-size:median;font-weight:bold;">Date  </span>
+  <input clrDate placeholder="From" name="fromDt"  [(ngModel)]="qryDateFrom"/>
+  <input clrDate placeholder="To"  name="toDt" [(ngModel)]="qryDateTo"/>
+  <span class="col-1" style="font-size:median;font-weight:bold;">Mask  </span>
+  <select  name="mask"  style="text-align: right;width: 200px;">
+    <option value="2021Q2">TKMG16-900C-2</option>
+    <option value="2021Q1">TMIG19-900C-3</option>
+    <option value="2021Q2">TMIG19-960C-2</option>
+    <option value="2021Q2">TKMG33-940C-2</option>
+  </select>
+  <button class="btn btn-icon btn-outline-gray btn-sm"  (click)="query()"> 
+    <clr-icon shape="search" size='16'></clr-icon>
+  </button>
+</div>
+ <div class="container-fluid card" style="text-align: center;margin-top: 10px;" >
+  <div >
+    <clr-tabs>
+      <clr-tab >
+        <button class="" clrTabLink>Inspection</button>
+        <ng-template [(clrIfActive)]="inspDataTabActive">
+          <clr-tab-content >
+          <div style="text-align: left;" >
+              <button class="btn btn-icon" (click)="onBtnExport()" > <clr-icon shape="note" title="Edit"></clr-icon></button>
+              <button class="btn btn-icon" (click)="onBtnExport()" title="Export to CSV"> <clr-icon shape="export" title="Export to CSV"></clr-icon></button>
+          </div>
+          <div style="height: 100%;width: 100%;">
+            <ag-grid-angular
+            [rowHeight]="rowHeight"
+            style="width: 100%;height:680px"
+            class="ag-theme-alpine grid-wrapper"
+            [rowData]="inspData"
+            [groupHeaderHeight]="27"
+            [headerHeight]="27"
+            [columnDefs]="inspDataColumns"
+            enableCellTextSelection=true 
+            (selectionChanged)="onSelectionChanged($event)"
+            (gridReady)="onInspDataGridReady($event)">
+          </ag-grid-angular>  
+
+          </div>
+          
+          </clr-tab-content>
+        </ng-template>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>PRP</button>
+        <ng-template [(clrIfActive)]="prpDataTabActive">
+          <clr-tab-content>
+            <div style="height: 100%;width: 100%;">
+            <ag-grid-angular
+            style="width: 100%;height:680px"
+            [rowHeight]="rowHeight"
+            class="ag-theme-alpine"
+            [groupHeaderHeight]="27"
+            [headerHeight]="27"
+            [rowData]="prpData"
+            [columnDefs]="prpDataColumns"
+            (selectionChanged)="onSelectionChanged($event)"
+            (gridReady)="onPrpDataGridReady($event)">
+          </ag-grid-angular>
+        </div>
+          </clr-tab-content>
+        </ng-template>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>PRP Overview</button>
+        <ng-template [(clrIfActive)]="prpChartTabActive">
+          <clr-tab-content>
+            <div style="width: 100%;height: 30%;" >
+              <div class="row" >
+                <div class="col-sm-4 card">
+                  <div  echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm-8 card h-30">
+                  <div  echarts [options]="prpWeeklyChartData" [merge]="prpWeeklyChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4 card">
+                  <div echarts [options]="defectEleOption" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm-8 card h-30">
+                  <div echarts [options]="eleWeeklyChartData" [merge]="eleWeeklyChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </clr-tab-content>
+        </ng-template>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>PRP By Tool</button>
+        <ng-template [(clrIfActive)]="prpChartByToolTabActive">
+          <clr-tab-content>
+            <div style="width: 100%;height: 30%;" >
+              <div class="row" >
+                <div class="col-sm card h-30" *ngFor="let prpChart of prpToolCharts">
+                  <div echarts [options]="prpChart" [merge]="prpChart" class="demo-chart" style="width: 100%;"></div>
+                </div>
+              </div>
+              <!-- <div class="row">
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+                <div class="col-sm card h-30">
+                  <div #prpWeeklyTrendChart echarts [options]="prpWeeklyTrendChartData" [merge]="prpWeeklyTrendChartData" class="demo-chart" style="width: 100%;"></div>
+                </div>
+              </div> -->
+            </div>
+          </clr-tab-content>
+        </ng-template>
+
+      </clr-tab>
+    </clr-tabs>
+</div>
+</div>
+
+
+
+
+<!--
+<clr-accordion clrAccordionMultiPanel=true clrAccordionPanelOpen=true style="height:100%">
+  <clr-accordion-panel [(clrAccordionPanelOpen)]="highlightOpen" >
+    <clr-accordion-title >
+      <span class="text-primary" style="font-weight:bold;font-size:14px">Highlight</span>
+    </clr-accordion-title>
+    <clr-accordion-content >
+      
+    </clr-accordion-content>
+  </clr-accordion-panel>
+  <clr-accordion-panel [(clrAccordionPanelOpen)]="queryContentOpen" style="height:60%">
+    <clr-accordion-title >
+      <span class="text-primary" style="font-weight:bold;font-size:14px">Overview</span>
+    </clr-accordion-title>
+    <clr-accordion-content >
+ 
+     
+    </clr-accordion-content>
+  </clr-accordion-panel>
+</clr-accordion>-->

@@ -1,0 +1,197 @@
+
+<!--<div class="container-fluid" style="text-align: center; height: 50px; background-color:#eeeeee;color:#333333" >
+  <div >
+  <span class="card-block" style=" font-size:x-large;font-weight: bold;">EUV Mask Case Center</span>
+  </div>
+  <div style="text-align: right;">
+   
+    <div class="dropdown">
+      <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+        Date
+      </button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+        <li><a class="dropdown-item" href="#">2021Q1</a></li>
+        <li><a class="dropdown-item" href="#">Another action</a></li>
+        <li><a class="dropdown-item" href="#">Something else here</a></li>
+      </ul>
+    </div>
+    <select name="cars"  style="text-align: right;">
+      <option value="2021Q1">2021/03/19</option>
+     
+    </select>
+ </div>
+  
+
+
+</div>
+-->
+<div class="container-fluid" style="text-align: center; height: 30px; background-color:#eeeeee;color:rgb(51, 49, 49)" >
+  <div >
+    <span class="card-block" style=" font-size:x-large;font-weight: bold;">Mask Case Center</span>
+  </div>
+  
+</div>
+<div class="clr-form-control1 card" style="height: 30px;margin-bottom: 10px;margin-top: 10px;">
+  <span class="col-1"  style="font-size:median;font-weight:bold;">Date  </span>
+  <input clrDate placeholder="From" name="fromDt"  [(ngModel)]="qryDateFrom"/>
+  <input clrDate placeholder="To"  name="toDt" [(ngModel)]="qryDateTo"/>
+
+  <span class="col-1" style="font-size:median;font-weight:bold;">Mask  </span>
+  <select  name="mask"  style="text-align: right;width: 200px;">
+    <option value="2021Q2">TKMG16-900C-2</option>
+    <option value="2021Q1">TMIG19-900C-3</option>
+    <option value="2021Q2">TMIG19-960C-2</option>
+    <option value="2021Q2">TKMG33-940C-2</option>
+  </select>
+  <button class="btn btn-icon btn-outline-gray btn-sm"  (click)="query()"> 
+    <clr-icon shape="search" size='16'></clr-icon>
+  </button>
+</div>
+
+
+<clr-accordion  clrAccordionMultiPanel=true clrAccordionPanelOpen="caseSummaryOpen">
+  <clr-accordion-panel  [(clrAccordionPanelOpen)]="caseSummaryOpen">
+    <clr-accordion-title >
+      <span class="text-primary" style="font-weight:bold;font-size:16px">Case Suummary</span>
+    </clr-accordion-title>
+    <clr-accordion-content  >
+        <ag-grid-angular
+        style="width:  100%; height: 170px;"
+        class="ag-theme-alpine"
+        rowSelection="single"
+        [rowData]="caseCenterRowData"
+        [columnDefs]="caseSummaryColumnDefs"
+      
+        (selectionChanged)="onCaseSummarySelectionChanged($event)"
+        (gridReady)="onCaseSummaryGridReady($event)">
+      </ag-grid-angular>    
+    </clr-accordion-content>
+  </clr-accordion-panel>
+  <clr-accordion-panel [(clrAccordionPanelOpen)]="caseDetailOpen">
+    <clr-accordion-title>  <span class="text-primary" style="font-weight:bold;font-size:16px">Case Detail</span></clr-accordion-title>
+    <clr-accordion-content *clrIfExpanded>
+      
+      <div  class="container-fluid bg-light" style="width:100%;height:600px">
+         <!--<div class="content-container">
+          <div class="content-area">
+            <div class="container-fluid border-light rounded bg-light">
+              <span class="text-primary" style="font-weight:bold;font-size:16px">Case Suummary</span>
+                  <ag-grid-angular
+                  style="width:  100%; height: 200px;"
+                  class="ag-theme-alpine"
+                  [rowData]="caseCenterRowData"
+                  [columnDefs]="caseSummaryColumnDefs"
+                  (selectionChanged)="onSelectionChanged($event)"
+                  (gridReady)="onCaseCennterGridReady($event)">
+                </ag-grid-angular>  
+            </div>
+        
+            
+            </div>
+         
+        </div>
+
+      -->
+        <clr-tabs clrLayout="clr-timeline" style="width:30%;height: 100%;" clrLayout="vertical">
+              
+              <clr-tab *ngFor="let case of selCaseDetailList" style="width:40px">
+                <button clrTabLink  (click)="onCaseDetailSelectionChanged(case)">{{case.caseMask}}</button>
+                <clr-tab-content *clrIfActive="true" class="col-8"  style="width:100%;height: 100%;"  style='background-color:wheat'>
+                  <div class='content-container' style='width:100%;height:1px;background-color:wheat'></div>
+                  <div class='row bg-light crl-col-8'  style="width:100%;" >
+                    <ul class="clr-timeline"  style="width:100%;height:100%" >
+                     <li class="clr-timeline-step disabled " *ngFor="let caseProcess of case.caseDetail.process">
+                      <div class="clr-timeline-step-header">{{caseProcess.procDt}}</div>
+                      <cds-icon *ngIf="caseProcess.procStatus=='COMPLETED'" shape="success-standard" aria-label="Success"></cds-icon>
+                      <clr-spinner *ngIf="caseProcess.procStatus=='PROCESSING'"  clrMedium aria-label="In progress">Fetching data</clr-spinner>
+                      <cds-icon *ngIf="caseProcess.procStatus=='ERROR'"  shape="error-standard" aria-label="Error"></cds-icon>
+                      <cds-icon *ngIf="caseProcess.procStatus=='WAIT'"   shape="circle" aria-label="Non-Start"></cds-icon>
+                      <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title">{{caseProcess.procName}}</span>
+                      </div>
+                     </li>
+                    </ul>
+                  </div>
+                  <div class='conten-area' style='height:80%;width:100%'>
+                    <div id="caseBasicGrid">
+                      <ag-grid-angular 
+                      style="width: 100%;height: 400px;"
+                      class="ag-theme-alpine bg-light"
+                      [rowData]="case.caseDetail.defects"
+                      rowSelection="single"
+                      [columnDefs]="defectColDefs"
+                      [defaultColDef]="defaultColDef"
+                      (selectionChanged)="onCaseSelectionChanged($event)"
+                      (gridReady)="onCaseGridReady($event)"
+                      [masterDetail]="true"
+                      [enableCellChangeFlash]="true"
+                      [detailCellRenderer]="detailCellRenderer"
+                      [frameworkComponents]="frameworkComponents"
+                      (firstDataRendered)="onFirstDataRendered($event)"
+                      ensureDomOrder=true
+                      ></ag-grid-angular>
+                      </div>
+                      <div id="casePotentialLotGrid">
+                      <ag-grid-angular 
+                      style="width: 100%;height: 400px;display:none"
+                      class="ag-theme-alpine bg-light"
+                      [rowData]="case.caseDetail.defects"
+                      rowSelection="single"
+                      [columnDefs]="defectColDefs"
+                      [defaultColDef]="defaultColDef"
+                      (selectionChanged)="onCaseSelectionChanged($event)"
+                      (gridReady)="onCaseGridReady($event)"
+                      [masterDetail]="true"
+                      [detailCellRenderer]="detailCellRenderer"
+                      [frameworkComponents]="frameworkComponents"
+                      (firstDataRendered)="onFirstDataRendered($event)"
+                      ensureDomOrder=true
+                      ></ag-grid-angular>
+                    </div>
+                    </div>
+                    
+                </clr-tab-content>
+              </clr-tab>
+            
+        </clr-tabs>
+
+        <div class='row'>
+          <!-- <div class="col-11 border border-light rounded bg-light">
+            <h6 class="text-primary bg-light  text-left text-white p-1 rounded">Case</h6>
+            
+ 
+          <clr-signpost>
+            <clr-signpost-content *clrIfOpen>
+              <h3>Default Signpost</h3>
+              <p>Position: <code class="clr-code">right-middle</code></p>
+            </clr-signpost-content>
+          </clr-signpost>
+
+-->
+            <!--
+            <ag-grid-angular 
+            style="width: 100%; height: 400px;"
+            class="ag-theme-balham"
+            [rowData]="caseRowData"
+            rowSelection="single"
+            [columnDefs]="caseColDefs"
+            [defaultColDef]="defaultColDef"
+            (selectionChanged)="onCaseSelectionChanged($event)"
+            (gridReady)="onCaseGridReady($event)"
+            enableCellTextSelection=true 
+            
+            ensureDomOrder=true
+            >
+            </ag-grid-angular>
+            -->
+          </div>
+         
+        </div>
+
+
+
+
+
+    </clr-accordion-content>
+  </clr-accordion-panel>
+</clr-accordion>
